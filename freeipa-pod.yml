@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: freeipa-init
+  labels:
+    app: freeipa-init-pod
+spec:
+  setHostnameAsFQDN: true
+  hostname: freeipa
+  containers:
+    - name: freeipa-pod
+      #image: freeipa/freeipa-server:fedora-rawhide
+      image: freeipa/freeipa-server:centos-8
+      ports:
+        - containerPort: 80
+        - containerPort: 443
+        - containerPort: 389
+        - containerPort: 636
+        - containerPort: 53
+      volumeMounts:
+        - mountPath: /data
+          name: ipa-data
+        - mountPath: /sys/fs/cgroup
+          name: cgroup
+      env:
+        - name: PASSWORD
+          value: vduTR37s_u
+      #command: ["/usr/sbin/ipa-server-install"]
+      #args: [ "-U -r trt3.jus.br --setup-dns --forwarder 181.213.132.2" ]
+      args: ["-U","-r","trt3.jus.br","--setup-dns","--forwarder","181.213.132.2"]
+      #args: ["-U","-r trt3.jus.br"]
+  volumes:         
+    - name: ipa-data
+      hostPath: 
+        path: /data/freeipa
+        type: DirectoryOrCreate
+    - name: cgroup
+      hostPath: 
+        path: /sys/fs/cgroup
+        type: Directory
